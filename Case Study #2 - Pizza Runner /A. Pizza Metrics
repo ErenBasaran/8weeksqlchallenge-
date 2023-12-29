@@ -1,0 +1,5 @@
+-- How many pizzas were ordered? -- <br>
+
+Solitions <br>
+
+select count(*) from customer_orders <br>
