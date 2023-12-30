@@ -1,5 +1,77 @@
 -- How many pizzas were ordered? -- <br>
 
-Solitions <br>
+Solitions: <br>
 
-select count(*) from customer_orders <br>
+select count(*) from customer_orders ; <br>
+
+-- How many unique customer orders were made? -- 
+
+Solitions: <br>
+
+select count(distinct customer_id) from customer_orders ; <br>
+
+-- How many successful orders were delivered by each runner? -- 
+
+Solitions: <br>
+
+select runner_id, count(order_id) as successful_order from runner_orders
+where distance != 'null'
+group by runner_id 
+order by runner_id ;
+
+-- How many of each type of pizza was delivered? --
+
+Solitions: <br>
+
+select pizza_names.pizza_name, count(runner_orders.order_id) from customer_orders
+join pizza_names on pizza_names.pizza_id = customer_orders.pizza_id
+join runner_orders on runner_orders.order_id = customer_orders.order_id
+where runner_orders.distance != 'null'
+group by pizza_names.pizza_name
+order by pizza_names.pizza_name; <br>
+
+-- How many Vegetarian and Meatlovers were ordered by each customer? -- <br>
+
+Solitions: <br>
+
+select pizza_names.pizza_name, customer_orders.customer_id, count(runner_orders.order_id) from customer_orders
+join pizza_names on pizza_names.pizza_id = customer_orders.pizza_id
+join runner_orders on runner_orders.order_id = customer_orders.order_id
+where runner_orders.distance != 'null'
+group by pizza_names.pizza_name, customer_orders.customer_id
+order by pizza_names.pizza_name; <br>
+
+-- What was the maximum number of pizzas delivered in a single order? -- 
+
+Solitions: <br>
+
+select max(pizza_per_order) as pizza_count from
+(select c.order_id, count(c.pizza_id) as pizza_per_order from customer_orders as c
+join runner_orders as r on c.order_id = r.order_id
+where r.distance != 'Null'
+group by c.order_id) <br>
+
+-- For each customer, how many delivered pizzas had at least 1 change and how many had no changes? --
+
+Solitions: <br>
+
+select 
+  c.customer_id,
+  sum(
+    case when c.exclusions <> ' ' or c.extras <> ' ' then 1
+    else 0
+    end) as at_least_1_change,
+  sum(
+    case when c.exclusions = ' ' and c.extras = ' ' then 1 
+    else 0
+    end) as no_change
+from customer_orders as c
+join runner_orders as r
+  on c.order_id = r.order_id
+where r.distance != 'Null'
+group by c.customer_id
+order by c.customer_id; <br>
+
+
+
+
