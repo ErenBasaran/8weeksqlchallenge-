@@ -51,7 +51,7 @@ join runner_orders as r on c.order_id = r.order_id
 where r.distance != 'Null'
 group by c.order_id) <br>
 
--- For each customer, how many delivered pizzas had at least 1 change and how many had no changes? --
+-- For each customer, how many delivered pizzas had at least 1 change and how many had no changes? --  <br>
 
 Solitions: <br>
 
@@ -71,6 +71,42 @@ join runner_orders as r
 where r.distance != 'Null'
 group by c.customer_id
 order by c.customer_id; <br>
+
+-- How many pizzas were delivered that had both exclusions and extras? --  <br>
+
+Solitions: <br>
+
+select sum
+(case 
+	when exclusions != 'null' and extras != 'null' then 1
+	else 0
+	end) as both_exc_and_ext
+	from customer_orders
+	join runner_orders on customer_orders.order_id = runner_orders.order_id
+	where cancellation = 'null'; <br>
+
+-- What was the total volume of pizzas ordered for each hour of the day? -- <br>
+
+Solutions: <br>
+
+select date_part('hour', order_time), count(order_id) from customer_orders
+group by date_part('hour', order_time)
+order by date_part('hour', order_time); <br>
+
+-- What was the volume of orders for each day of the week? -- <br>
+
+Solutions: <br>
+
+select to_char(order_time, 'day'), count(order_id) from customer_orders
+group by to_char(order_time, 'day')
+order by to_char(order_time, 'day'); <br>
+
+
+
+
+
+
+
 
 
 
