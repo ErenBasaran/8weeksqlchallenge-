@@ -1,1 +1,66 @@
+-- How many runners signed up for each 1 week period? -- <br>
 
+Solutions: <br>
+
+select to_char(registration_date, 'week'), count(runner_id) from runners
+group by to_char(registration_date, 'week')
+order by to_char(registration_date, 'week');
+
+-- What was the average time in minutes it took for each runner to arrive at the Pizza Runner HQ to pickup the order? -- <br>
+
+Solutions: <br>    bunu sor
+
+select runner_orders.runner_id, round(avg(timestampdiff(minute, customer_orders.order_time, runner_orders.pickup_time)),1) as avg_time from customer_orders
+join runner_orders on runner_orders.order_id = customer_orders.order_id
+group by  runner_orders.runner_id
+
+-- What was the average distance travelled for each customer? -- <br>
+
+Solutions: <br>    bunu sor
+
+select customer_orders.customer_id, avg(runner_orders.distance) from customer_orders
+left join runner_orders on customer_orders.order_id = runner_orders.order_id
+group by customer_orders.customer_id; <br> 
+
+-- What was the difference between the longest and shortest delivery times for all orders? -- <br>
+
+Solutions: <br> 
+
+select
+    max(duration) - min(duration) as delivery_time_diff
+from runner_orders; <br> 
+
+-- What was the average speed for each runner for each delivery and do you notice any trend for these values? -- <br>
+
+Solutions: <br> 
+
+select
+	runner_id,
+    avg(distance),
+    avg(duration)
+from runner_orders
+group by runner_id;<br>
+
+-- What is the successful delivery percentage for each runner? -- <br>
+
+Solutions: <br> 
+
+with cancellation_counter as (
+select
+	runner_id,
+    case
+    	when cancellation is NULL or cancellation = 'NaN' then 1
+	else 0
+    end as no_cancellation_count,
+    case
+    	when cancellation is not NULL or cancellation != 'NaN' then 1
+	else 0
+    end as cancellation_count
+from runner_orders
+)
+    
+select 
+	runner_id,
+    sum(no_cancellation_count) / (sum(no_cancellation_count) + sum(cancellation_count))*100 as delivery_success_percentage
+from cancellation_counter
+group by runner_id; <br>
